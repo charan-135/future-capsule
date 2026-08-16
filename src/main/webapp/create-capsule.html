@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Write a Capsule — Future Capsule</title>
+
+    <link rel="stylesheet"
+          href="css/style.css">
+
+    <style>
+
+        /* =========================
+           CREATE CAPSULE PAGE
+           ========================= */
+
+        .create-page {
+            min-height: 100vh;
+        }
+
+        .create-header {
+            padding: 70px 0 55px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: flex-end;
+
+            border-bottom: 1px solid var(--line);
+        }
+
+        .create-label {
+            font-family: 'DM Mono', monospace;
+
+            font-size: 10px;
+
+            letter-spacing: 0.18em;
+
+            text-transform: uppercase;
+
+            color: var(--accent);
+
+            margin-bottom: 22px;
+        }
+
+        .create-header h1 {
+            font-family: 'Instrument Serif', serif;
+
+            font-size: clamp(60px, 9vw, 125px);
+
+            line-height: 0.82;
+
+            font-weight: 400;
+
+            letter-spacing: -0.05em;
+        }
+
+        .create-header h1 em {
+            color: var(--muted);
+
+            font-style: italic;
+        }
+
+        .create-number {
+            font-family: 'DM Mono', monospace;
+
+            color: var(--muted);
+
+            font-size: 10px;
+
+            letter-spacing: 0.15em;
+
+            padding-bottom: 8px;
+        }
+
+
+        /* FORM */
+
+        .capsule-form {
+            max-width: 1000px;
+
+            margin: 0 auto;
+
+            padding: 80px 0 120px;
+        }
+
+        .field {
+            border-bottom: 1px solid var(--line);
+
+            padding: 34px 0;
+        }
+
+        .field-label {
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 18px;
+        }
+
+        .field-label span:first-child {
+            font-family: 'DM Mono', monospace;
+
+            font-size: 10px;
+
+            letter-spacing: 0.16em;
+
+            text-transform: uppercase;
+
+            color: var(--muted);
+        }
+
+        .character-count {
+            font-family: 'DM Mono', monospace;
+
+            font-size: 9px;
+
+            color: #666;
+
+            letter-spacing: 0.08em;
+        }
+
+        .capsule-input,
+        .capsule-textarea {
+            width: 100%;
+
+            border: none;
+
+            outline: none;
+
+            background: transparent;
+
+            color: var(--white);
+
+            font-family: 'Instrument Serif', serif;
+
+            font-weight: 400;
+        }
+
+        .capsule-input {
+            font-size: clamp(32px, 5vw, 65px);
+
+            line-height: 1;
+
+            letter-spacing: -0.03em;
+        }
+
+        .capsule-input::placeholder,
+        .capsule-textarea::placeholder {
+            color: #3f3f3f;
+        }
+
+        .capsule-textarea {
+            min-height: 250px;
+
+            resize: vertical;
+
+            font-size: clamp(25px, 3vw, 40px);
+
+            line-height: 1.15;
+
+            letter-spacing: -0.02em;
+        }
+
+
+        /* DATE */
+
+        .date-row {
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 40px;
+        }
+
+        .date-input {
+            width: 100%;
+
+            border: none;
+
+            outline: none;
+
+            background: transparent;
+
+            color: var(--white);
+
+            font-family: 'DM Mono', monospace;
+
+            font-size: 18px;
+
+            color-scheme: dark;
+
+            padding: 10px 0;
+        }
+
+
+        /* SUBMIT */
+
+        .submit-area {
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            padding-top: 55px;
+        }
+
+        .submit-note {
+            max-width: 300px;
+
+            color: var(--muted);
+
+            font-size: 12px;
+
+            line-height: 1.6;
+        }
+
+        .seal-button {
+            border: none;
+
+            cursor: pointer;
+
+            background: var(--accent);
+
+            color: #090909;
+
+            border-radius: 100px;
+
+            padding: 17px 28px;
+
+            font-family: 'DM Sans', sans-serif;
+
+            font-size: 11px;
+
+            font-weight: 600;
+
+            letter-spacing: 0.06em;
+
+            text-transform: uppercase;
+
+            transition:
+                    transform 0.25s ease,
+                    background 0.25s ease;
+        }
+
+        .seal-button:hover {
+            transform: translateY(-3px);
+
+            background: #ff8064;
+        }
+
+        .back-link {
+            display: inline-block;
+
+            margin-top: 35px;
+
+            font-family: 'DM Mono', monospace;
+
+            font-size: 9px;
+
+            color: var(--muted);
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.1em;
+
+            transition: color 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: var(--white);
+        }
+
+
+        /* FOCUS */
+
+        .field:focus-within {
+            border-color: rgba(255, 105, 71, 0.7);
+        }
+
+
+        /* MOBILE */
+
+        @media (max-width: 700px) {
+
+            .create-header {
+                display: block;
+
+                padding: 55px 0 40px;
+            }
+
+            .create-number {
+                margin-top: 25px;
+            }
+
+            .capsule-form {
+                padding-top: 45px;
+            }
+
+            .date-row {
+                grid-template-columns: 1fr;
+
+                gap: 0;
+            }
+
+            .submit-area {
+                display: block;
+            }
+
+            .submit-note {
+                margin-bottom: 25px;
+            }
+
+            .seal-button {
+                width: 100%;
+            }
+        }
+
+
+        /* =========================
+   SUCCESS MODAL
+   ========================= */
+
+        .modal-overlay {
+
+            position: fixed;
+
+            inset: 0;
+
+            background: rgba(5, 5, 5, 0.82);
+
+            backdrop-filter: blur(12px);
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 25px;
+
+            z-index: 9999;
+
+            opacity: 0;
+
+            visibility: hidden;
+
+            transition:
+                    opacity 0.35s ease,
+                    visibility 0.35s ease;
+        }
+
+        .modal-overlay.active {
+
+            opacity: 1;
+
+            visibility: visible;
+        }
+
+
+        .success-modal {
+
+            position: relative;
+
+            width: min(520px, 100%);
+
+            background: #111;
+
+            border: 1px solid #2d2d2d;
+
+            padding: 55px;
+
+            transform: translateY(25px) scale(0.97);
+
+            transition:
+                    transform 0.4s ease;
+
+            box-shadow:
+                    0 30px 100px rgba(0, 0, 0, 0.55);
+        }
+
+        .modal-overlay.active .success-modal {
+
+            transform:
+                    translateY(0)
+                    scale(1);
+        }
+
+
+        .modal-close {
+
+            position: absolute;
+
+            top: 18px;
+
+            right: 20px;
+
+            width: 35px;
+
+            height: 35px;
+
+            border: 1px solid #333;
+
+            border-radius: 50%;
+
+            background: transparent;
+
+            color: #aaa;
+
+            font-size: 20px;
+
+            cursor: pointer;
+
+            transition:
+                    background 0.2s ease,
+                    color 0.2s ease;
+        }
+
+        .modal-close:hover {
+
+            background: #222;
+
+            color: white;
+        }
+
+
+        .success-mark {
+
+            width: 58px;
+
+            height: 58px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 50%;
+
+            background: var(--accent);
+
+            color: #090909;
+
+            font-size: 25px;
+
+            margin-bottom: 30px;
+
+            animation: markPop 0.5s ease;
+        }
+
+        @keyframes markPop {
+
+            0% {
+                transform: scale(0);
+            }
+
+            70% {
+                transform: scale(1.15);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+
+        .modal-label {
+
+            font-family: 'DM Mono', monospace;
+
+            color: var(--accent);
+
+            font-size: 9px;
+
+            letter-spacing: 0.18em;
+
+            margin-bottom: 18px;
+        }
+
+
+        .success-modal h2 {
+
+            font-family: 'Instrument Serif', serif;
+
+            font-size: 55px;
+
+            font-weight: 400;
+
+            line-height: 0.9;
+
+            letter-spacing: -0.04em;
+
+            margin: 0;
+        }
+
+        .success-modal h2 em {
+
+            color: var(--muted);
+
+            font-style: italic;
+        }
+
+
+        .modal-message {
+
+            max-width: 340px;
+
+            margin-top: 25px;
+
+            color: var(--muted);
+
+            font-size: 13px;
+
+            line-height: 1.7;
+        }
+
+
+        .modal-id {
+
+            margin-top: 35px;
+
+            padding: 18px 0;
+
+            border-top: 1px solid #292929;
+
+            border-bottom: 1px solid #292929;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+        }
+
+        .modal-id span {
+
+            font-family: 'DM Mono', monospace;
+
+            color: #666;
+
+            font-size: 9px;
+
+            letter-spacing: 0.15em;
+        }
+
+        .modal-id strong {
+
+            font-family: 'DM Mono', monospace;
+
+            color: white;
+
+            font-size: 13px;
+        }
+
+
+        .modal-actions {
+
+            display: flex;
+
+            gap: 12px;
+
+            margin-top: 30px;
+        }
+
+        .modal-primary {
+
+            flex: 1;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background: var(--accent);
+
+            color: #090909;
+
+            border-radius: 100px;
+
+            padding: 15px 20px;
+
+            font-size: 10px;
+
+            font-weight: 600;
+
+            letter-spacing: 0.05em;
+
+            text-transform: uppercase;
+
+            text-decoration: none;
+
+            transition:
+                    transform 0.2s ease;
+        }
+
+        .modal-primary:hover {
+
+            transform: translateY(-2px);
+        }
+
+
+        .modal-secondary {
+
+            background: transparent;
+
+            color: #aaa;
+
+            border: 1px solid #333;
+
+            border-radius: 100px;
+
+            padding: 15px 20px;
+
+            font-size: 10px;
+
+            cursor: pointer;
+
+            transition:
+                    color 0.2s ease,
+                    border-color 0.2s ease;
+        }
+
+        .modal-secondary:hover {
+
+            color: white;
+
+            border-color: #666;
+        }
+
+
+        @media (max-width: 600px) {
+
+            .success-modal {
+
+                padding: 40px 25px;
+            }
+
+            .success-modal h2 {
+
+                font-size: 45px;
+            }
+
+            .modal-actions {
+
+                flex-direction: column;
+            }
+
+        }
+
+        .modal-times {
+
+            margin-top: 35px;
+
+            border-top: 1px solid #292929;
+
+            border-bottom: 1px solid #292929;
+        }
+
+
+        .modal-time {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            padding: 18px 0;
+        }
+
+
+        .modal-time + .modal-time {
+
+            border-top: 1px solid #222;
+        }
+
+
+        .modal-time span {
+
+            font-family: 'DM Mono', monospace;
+
+            color: #666;
+
+            font-size: 9px;
+
+            letter-spacing: 0.15em;
+        }
+
+
+        .modal-time strong {
+
+            font-family: 'DM Mono', monospace;
+
+            color: white;
+
+            font-size: 11px;
+
+            font-weight: 400;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="container create-page">
+
+
+    <!-- NAVIGATION -->
+
+    <nav class="navbar">
+
+        <a href="dashboard"
+           class="logo">
+
+            FUTURE
+            <span>CAPSULE</span>
+
+        </a>
+
+        <div class="nav-links">
+
+            <a href="my-capsules">
+                My Capsules
+            </a>
+
+            <a href="dashboard">
+                Dashboard
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- HEADER -->
+
+    <header class="create-header">
+
+        <div>
+
+            <div class="create-label">
+                02 / WRITE
+            </div>
+
+            <h1>
+                Write to
+                <br>
+                your <em>future.</em>
+            </h1>
+
+        </div>
+
+        <div class="create-number">
+            A MESSAGE FOR ANOTHER TIME
+        </div>
+
+    </header>
+
+
+    <!-- FORM -->
+
+    <main>
+
+        <form
+                action="capsule"
+                method="post"
+                class="capsule-form">
+
+
+            <!-- TITLE -->
+
+            <div class="field">
+
+                <div class="field-label">
+
+                    <span>
+                        Title
+                    </span>
+
+                    <span
+                            class="character-count"
+                            id="titleCount">
+                        0 / 120
+                    </span>
+
+                </div>
+
+                <input
+                        type="text"
+                        name="title"
+                        id="title"
+                        class="capsule-input"
+                        maxlength="120"
+                        placeholder="A letter to myself..."
+                        required>
+
+            </div>
+
+
+            <!-- MESSAGE -->
+
+            <div class="field">
+
+                <div class="field-label">
+
+                    <span>
+                        Your message
+                    </span>
+
+                    <span
+                            class="character-count"
+                            id="messageCount">
+                        0 / 2000
+                    </span>
+
+                </div>
+
+                <textarea
+                        name="message"
+                        id="message"
+                        class="capsule-textarea"
+                        maxlength="2000"
+                        placeholder="Start writing..."
+                        required></textarea>
+
+            </div>
+
+
+            <!-- DELIVERY DATE -->
+
+            <div class="field">
+
+                <div class="field-label">
+
+                    <span>
+                        Deliver on
+                    </span>
+
+                </div>
+
+                <div class="date-row">
+
+                    <div>
+
+                        <div class="character-count">
+                            DATE
+                        </div>
+
+                        <input
+                                type="date"
+                                name="deliveryDateDate"
+                                id="deliveryDate"
+                                class="date-input"
+                                required>
+                    </div>
+
+
+                    <div>
+
+                        <div class="character-count">
+                            TIME
+                        </div>
+
+                        <input
+                                type="time"
+                                name="deliveryTime"
+                                id="deliveryTime"
+                                class="date-input"
+                                required>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- SUBMIT -->
+
+            <div class="submit-area">
+
+                <p class="submit-note">
+
+                    Once sealed, your message will
+                    remain safely stored until its
+                    delivery date.
+
+                </p>
+
+                <button
+                        type="submit"
+                        class="seal-button">
+
+                    Seal Capsule →
+
+                </button>
+
+            </div>
+
+
+            <a
+                    href="dashboard"
+                    class="back-link">
+
+                ← Back to dashboard
+
+            </a>
+
+
+        </form>
+
+    </main>
+
+
+    <!-- FOOTER -->
+
+    <footer class="footer">
+
+        <span>
+            FUTURE CAPSULE
+        </span>
+
+        <span>
+            Written today · Delivered tomorrow
+        </span>
+
+    </footer>
+
+
+</div>
+
+
+
+
+<!-- SUCCESS MODAL -->
+
+<div class="modal-overlay" id="successModal">
+
+    <div class="success-modal">
+
+        <button
+                type="button"
+                class="modal-close"
+                id="closeModal">
+            ×
+        </button>
+
+        <div class="success-mark">
+            ✓
+        </div>
+
+        <div class="modal-label">
+            CAPSULE SEALED
+        </div>
+
+        <h2>
+            Your message
+            <br>
+            is <em>safe.</em>
+        </h2>
+
+        <p class="modal-message">
+            Your words have been sealed away
+            for your future self.
+        </p>
+
+        <div class="modal-times">
+
+            <div class="modal-time">
+
+        <span>
+            SEALED ON
+        </span>
+
+                <strong id="sealedTime">
+                    --
+                </strong>
+
+            </div>
+
+
+            <div class="modal-time">
+
+        <span>
+            OPENS ON
+        </span>
+
+                <strong id="opensTime">
+                    --
+                </strong>
+
+            </div>
+
+        </div>
+
+        <div class="modal-actions">
+
+            <a
+                    href="my-capsules"
+                    class="modal-primary">
+                View My Capsules →
+            </a>
+
+            <button
+                    type="button"
+                    class="modal-secondary"
+                    id="createAnother">
+                Create Another
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    const title =
+        document.getElementById("title");
+
+    const message =
+        document.getElementById("message");
+
+    const titleCount =
+        document.getElementById("titleCount");
+
+    const messageCount =
+        document.getElementById("messageCount");
+
+    const form =
+        document.querySelector(".capsule-form");
+
+
+    title.addEventListener("input", () => {
+
+        titleCount.textContent =
+            title.value.length + " / 120";
+
+    });
+
+
+    message.addEventListener("input", () => {
+
+        messageCount.textContent =
+            message.value.length + " / 2000";
+
+    });
+
+
+    form.addEventListener("submit", async function (event) {
+
+        event.preventDefault();
+
+        const date =
+            document.getElementById("deliveryDate").value;
+
+        const time =
+            document.getElementById("deliveryTime").value;
+
+
+        if (!date || !time) {
+
+            alert("Please select a delivery date and time.");
+
+            return;
+        }
+
+
+        // Create the exact value expected by the servlet
+        const deliveryDate =
+            date + "T" + time;
+
+
+        // Create hidden field
+        let hiddenDate =
+            form.querySelector(
+                'input[name="deliveryDate"]'
+            );
+
+
+        if (!hiddenDate) {
+
+            hiddenDate =
+                document.createElement("input");
+
+            hiddenDate.type = "hidden";
+
+            hiddenDate.name = "deliveryDate";
+
+            form.appendChild(hiddenDate);
+        }
+
+
+        hiddenDate.value =
+            deliveryDate;
+
+
+        console.log(
+            "Sending deliveryDate:",
+            hiddenDate.value
+        );
+
+
+        const button =
+            form.querySelector(".seal-button");
+
+        const originalText =
+            button.textContent;
+
+        button.disabled = true;
+
+        button.textContent =
+            "SEALING...";
+
+
+        try {
+
+            const formData =
+                new FormData(form);
+
+
+            console.log(
+                "Form deliveryDate:",
+                formData.get("deliveryDate")
+            );
+
+
+            const response =
+                await fetch(
+                    form.action,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type":
+                                "application/x-www-form-urlencoded"
+                        },
+                        body: new URLSearchParams(formData)
+                    }
+                );
+
+
+            const result =
+                await response.text();
+
+
+            if (!response.ok) {
+
+                throw new Error(result);
+            }
+
+
+            const capsuleId =
+                result.trim();
+
+
+            if (!capsuleId ||
+                isNaN(capsuleId)) {
+
+                throw new Error(
+                    "Invalid response from server."
+                );
+            }
+
+
+            const now = new Date();
+
+            const deliveryDate =
+                document.getElementById("deliveryDate").value;
+
+            const deliveryTime =
+                document.getElementById("deliveryTime").value;
+
+
+            const sealedFormatted =
+                now.toLocaleString(
+                    "en-IN",
+                    {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: false
+                    }
+                );
+
+
+            const opensDate =
+                new Date(
+                    deliveryDate + "T" + deliveryTime
+                );
+
+
+            const opensFormatted =
+                opensDate.toLocaleString(
+                    "en-IN",
+                    {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: false
+                    }
+                );
+
+
+            document.getElementById(
+                "sealedTime"
+            ).textContent =
+                sealedFormatted;
+
+
+            document.getElementById(
+                "opensTime"
+            ).textContent =
+                opensFormatted;
+
+
+            document.getElementById(
+                "successModal"
+            ).classList.add("active");
+
+
+            document.getElementById(
+                "successModal"
+            ).classList.add("active");
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert(
+                "Something went wrong:\n\n" +
+                error.message
+            );
+
+        } finally {
+
+            button.disabled = false;
+
+            button.textContent =
+                originalText;
+        }
+
+    });
+    const successModal =
+        document.getElementById("successModal");
+
+    const closeModal =
+        document.getElementById("closeModal");
+
+    const createAnother =
+        document.getElementById("createAnother");
+
+
+    closeModal.addEventListener("click", () => {
+
+        successModal.classList.remove("active");
+
+    });
+
+
+    createAnother.addEventListener("click", () => {
+
+        window.location.reload();
+
+    });
+
+
+    successModal.addEventListener("click", (event) => {
+
+        if (event.target === successModal) {
+
+            successModal.classList.remove("active");
+
+        }
+
+    });
+
+</script>
+
+
+</body>
+
+</html>

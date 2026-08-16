@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Register — Future Capsule</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        body {
+
+            min-height: 100vh;
+
+            background: #090909;
+
+            color: #f4f1eb;
+
+            font-family:
+                    Arial,
+                    Helvetica,
+                    sans-serif;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 30px;
+
+            overflow: hidden;
+
+        }
+
+
+        /* =========================
+           BACKGROUND
+        ========================= */
+
+        .background {
+
+            position: fixed;
+
+            inset: 0;
+
+            pointer-events: none;
+
+            overflow: hidden;
+
+        }
+
+
+        .glow {
+
+            position: absolute;
+
+            width: 450px;
+
+            height: 450px;
+
+            border-radius: 50%;
+
+            background:
+                    radial-gradient(
+                            circle,
+                            rgba(255, 107, 69, 0.08),
+                            transparent 70%
+                    );
+
+            bottom: -180px;
+
+            left: -120px;
+
+        }
+
+
+        .grid {
+
+            position: absolute;
+
+            inset: 0;
+
+            opacity: 0.08;
+
+            background-image:
+                    linear-gradient(
+                            #fff 1px,
+                            transparent 1px
+                    ),
+                    linear-gradient(
+                            90deg,
+                            #fff 1px,
+                            transparent 1px
+                    );
+
+            background-size: 70px 70px;
+
+            mask-image:
+                    linear-gradient(
+                            to bottom,
+                            transparent,
+                            black 20%,
+                            black 80%,
+                            transparent
+                    );
+
+        }
+
+
+        /* =========================
+           CONTAINER
+        ========================= */
+
+        .container {
+
+            position: relative;
+
+            z-index: 1;
+
+            width: 100%;
+
+            max-width: 470px;
+
+        }
+
+
+        /* =========================
+           BRAND
+        ========================= */
+
+        .brand {
+
+            text-align: center;
+
+            margin-bottom: 35px;
+
+        }
+
+
+        .brand-name {
+
+            color: #fff;
+
+            font-size: 18px;
+
+            font-weight: 600;
+
+            letter-spacing: -0.03em;
+
+        }
+
+
+        .brand-tagline {
+
+            margin-top: 9px;
+
+            color: #555;
+
+            font-family: monospace;
+
+            font-size: 8px;
+
+            letter-spacing: 0.2em;
+
+            text-transform: uppercase;
+
+        }
+
+
+        /* =========================
+           CARD
+        ========================= */
+
+        .card {
+
+            padding: 42px;
+
+            background:
+                    rgba(15, 15, 15, 0.95);
+
+            border:
+                    1px solid #292929;
+
+            box-shadow:
+                    0 30px 80px
+                    rgba(0, 0, 0, 0.5);
+
+        }
+
+
+        .eyebrow {
+
+            color: #777;
+
+            font-family: monospace;
+
+            font-size: 8px;
+
+            letter-spacing: 0.2em;
+
+            text-transform: uppercase;
+
+            margin-bottom: 17px;
+
+        }
+
+
+        h1 {
+
+            font-family:
+                    Georgia,
+                    "Times New Roman",
+                    serif;
+
+            font-size: 48px;
+
+            font-weight: 400;
+
+            line-height: 0.95;
+
+            letter-spacing: -0.06em;
+
+        }
+
+
+        h1 em {
+
+            color: #ff6b45;
+
+            font-style: italic;
+
+        }
+
+
+        .intro {
+
+            margin-top: 17px;
+
+            color: #666;
+
+            font-size: 12px;
+
+            line-height: 1.7;
+
+        }
+
+
+        /* =========================
+           MESSAGE
+        ========================= */
+
+        .message {
+
+            margin-top: 22px;
+
+            padding: 13px 15px;
+
+            border: 1px solid #4a2720;
+
+            background:
+                    rgba(255, 107, 69, 0.05);
+
+            color: #d28b78;
+
+            font-size: 11px;
+
+            line-height: 1.5;
+
+            display: none;
+
+        }
+
+
+        .message.show {
+
+            display: block;
+
+        }
+
+
+        /* =========================
+           FORM
+        ========================= */
+
+        form {
+
+            margin-top: 30px;
+
+        }
+
+
+        .field {
+
+            margin-bottom: 22px;
+
+        }
+
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #aaa;
+
+            font-family: monospace;
+            font-size: 9px;
+            font-weight: 500;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+        }
+
+
+        .input-wrapper {
+
+            position: relative;
+
+        }
+
+
+        input {
+            width: 100%;
+            height: 52px;
+
+            padding: 0 16px;
+
+            border: 1px solid #383838;
+
+            outline: none;
+
+            background: #101010;
+
+            color: #f5f5f5;
+
+            font-size: 14px;
+            font-weight: 400;
+
+            transition:
+                    border-color 0.2s ease,
+                    background 0.2s ease,
+                    box-shadow 0.2s ease;
+        }
+
+
+
+
+        input:focus {
+
+            border-color: #ff6b45;
+
+            background: #0d0d0d;
+
+            box-shadow:
+                    0 8px 25px
+                    rgba(255, 107, 69, 0.04);
+
+        }
+
+
+        input::placeholder {
+            color: #777;
+            opacity: 1;
+        }
+
+        input:hover {
+            border-color: #555;
+            background: #121212;
+        }
+
+        input:focus {
+            border-color: #ff6b45;
+            background: #121212;
+
+            box-shadow:
+                    0 0 0 1px rgba(255, 107, 69, 0.12),
+                    0 8px 25px rgba(255, 107, 69, 0.05);
+        }
+
+
+        .password-input {
+
+            padding-right: 70px;
+
+        }
+
+
+        .toggle-password {
+            position: absolute;
+
+            right: 14px;
+            top: 50%;
+
+            transform: translateY(-50%);
+
+            border: 0;
+
+            background: transparent;
+
+            color: #777;
+
+            font-family: monospace;
+            font-size: 9px;
+            font-weight: 500;
+
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+
+            cursor: pointer;
+
+            transition:
+                    color 0.2s ease,
+                    transform 0.2s ease;
+        }
+
+        .toggle-password:hover {
+            color: #ff6b45;
+
+            transform:
+                    translateY(-50%)
+                    scale(1.05);
+        }
+
+
+
+
+
+        /* =========================
+           PASSWORD STRENGTH
+        ========================= */
+
+        .strength {
+
+            margin-top: 9px;
+
+            height: 2px;
+
+            background: #222;
+
+            overflow: hidden;
+
+        }
+
+
+        .strength-bar {
+
+            width: 0;
+
+            height: 100%;
+
+            background: #ff6b45;
+
+            transition:
+                    width 0.25s ease;
+
+        }
+
+
+        .strength-text {
+            margin-top: 8px;
+
+            color: #777;
+
+            font-family: monospace;
+
+            font-size: 8px;
+
+            letter-spacing: 0.08em;
+
+            text-transform: uppercase;
+        }
+
+
+        /* =========================
+           REGISTER BUTTON
+        ========================= */
+
+        .register-button {
+
+            position: relative;
+
+            overflow: hidden;
+
+            width: 100%;
+
+            height: 52px;
+
+            margin-top: 5px;
+
+            border: 0;
+
+            border-radius: 100px;
+
+            background: #ff6b45;
+
+            color: #080808;
+
+            font-size: 10px;
+
+            font-weight: 700;
+
+            letter-spacing: 0.15em;
+
+            text-transform: uppercase;
+
+            cursor: pointer;
+
+            transition:
+                    transform 0.25s ease,
+                    background 0.25s ease,
+                    box-shadow 0.25s ease;
+
+        }
+
+
+        .register-button::before {
+
+            content: "";
+
+            position: absolute;
+
+            top: 0;
+
+            left: -100%;
+
+            width: 100%;
+
+            height: 100%;
+
+            background:
+                    linear-gradient(
+                            90deg,
+                            transparent,
+                            rgba(255,255,255,0.18),
+                            transparent
+                    );
+
+            transition:
+                    left 0.5s ease;
+
+        }
+
+
+        .register-button:hover {
+
+            background: #ff815f;
+
+            transform:
+                    translateY(-3px);
+
+            box-shadow:
+                    0 12px 30px
+                    rgba(255, 107, 69, 0.18);
+
+        }
+
+
+        .register-button:hover::before {
+
+            left: 100%;
+
+        }
+
+
+        .register-button:active {
+
+            transform:
+                    translateY(0);
+
+            box-shadow: none;
+
+        }
+
+
+        .register-button:disabled {
+
+            opacity: 0.5;
+
+            cursor: not-allowed;
+
+            transform: none;
+
+            box-shadow: none;
+
+        }
+
+
+        /* =========================
+           LOGIN LINK
+        ========================= */
+
+        .login {
+
+            margin-top: 27px;
+
+            padding-top: 24px;
+
+            border-top: 1px solid #242424;
+
+            text-align: center;
+
+            color: #555;
+
+            font-size: 11px;
+
+        }
+
+
+        .login a {
+
+            position: relative;
+
+            color: #aaa;
+
+            text-decoration: none;
+
+            margin-left: 5px;
+
+            transition:
+                    color 0.2s ease;
+
+        }
+
+
+        .login a::after {
+
+            content: "";
+
+            position: absolute;
+
+            left: 0;
+
+            bottom: -4px;
+
+            width: 0;
+
+            height: 1px;
+
+            background: #ff6b45;
+
+            transition:
+                    width 0.25s ease;
+
+        }
+
+
+        .login a:hover {
+
+            color: #ff6b45;
+
+        }
+
+
+        .login a:hover::after {
+
+            width: 100%;
+
+        }
+
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        .footer {
+
+            margin-top: 22px;
+
+            text-align: center;
+
+            color: #3d3d3d;
+
+            font-family: monospace;
+
+            font-size: 7px;
+
+            letter-spacing: 0.15em;
+
+            text-transform: uppercase;
+
+        }
+
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 520px) {
+
+            body {
+
+                padding: 20px;
+
+                overflow: auto;
+
+            }
+
+
+            .brand {
+
+                margin-bottom: 25px;
+
+            }
+
+
+            .card {
+
+                padding: 30px 25px;
+
+            }
+
+
+            h1 {
+
+                font-size: 42px;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="background">
+
+    <div class="grid"></div>
+
+    <div class="glow"></div>
+
+</div>
+
+
+<div class="container">
+
+
+    <!-- BRAND -->
+
+    <div class="brand">
+
+        <div class="brand-name">
+            Future Capsule
+        </div>
+
+        <div class="brand-tagline">
+            Messages beyond time
+        </div>
+
+    </div>
+
+
+    <!-- CARD -->
+
+    <div class="card">
+
+
+        <div class="eyebrow">
+            Begin your journey
+        </div>
+
+
+        <h1>
+            Create your <em>future.</em>
+        </h1>
+
+
+        <p class="intro">
+
+            Create an account and start leaving
+            messages for the person you'll become.
+
+        </p>
+
+
+        <!-- MESSAGE -->
+
+        <div
+                class="message"
+                id="message">
+        </div>
+
+
+        <!-- FORM -->
+
+        <form
+                action="register"
+                method="post"
+                id="registerForm">
+
+
+            <!-- NAME -->
+
+            <div class="field">
+
+                <label for="name">
+                    Your Name
+                </label>
+
+                <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        placeholder="How should we remember you?"
+                        autocomplete="name"
+                        maxlength="100"
+                        required
+                >
+
+            </div>
+
+
+            <!-- EMAIL -->
+
+            <div class="field">
+
+                <label for="email">
+                    Email Address
+                </label>
+
+                <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="you@example.com"
+                        autocomplete="email"
+                        required
+                >
+
+            </div>
+
+
+            <!-- PASSWORD -->
+
+            <div class="field">
+
+                <label for="password">
+                    Password
+                </label>
+
+
+                <div class="input-wrapper">
+
+                    <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            class="password-input"
+                            placeholder="Create a password"
+                            autocomplete="new-password"
+                            minlength="6"
+                            required
+                    >
+
+
+                    <button
+                            type="button"
+                            class="toggle-password"
+                            data-target="password">
+                        Show
+                    </button>
+
+                </div>
+
+
+                <div class="strength">
+
+                    <div
+                            class="strength-bar"
+                            id="strengthBar">
+                    </div>
+
+                </div>
+
+
+                <div
+                        class="strength-text"
+                        id="strengthText">
+                    Enter a password
+                </div>
+
+            </div>
+
+
+            <!-- CONFIRM PASSWORD -->
+
+            <div class="field">
+
+                <label for="confirmPassword">
+                    Confirm Password
+                </label>
+
+
+                <div class="input-wrapper">
+
+                    <input
+                            type="password"
+                            id="confirmPassword"
+                            class="password-input"
+                            placeholder="Repeat your password"
+                            autocomplete="new-password"
+                            minlength="6"
+                            required
+                    >
+
+
+                    <button
+                            type="button"
+                            class="toggle-password"
+                            data-target="confirmPassword">
+                        Show
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- BUTTON -->
+
+            <button
+                    type="submit"
+                    class="register-button"
+                    id="registerButton">
+
+                Create Account
+
+            </button>
+
+
+        </form>
+
+
+        <!-- LOGIN -->
+
+        <div class="login">
+
+            Already have an account?
+
+            <a href="login.html">
+                Sign in
+            </a>
+
+        </div>
+
+
+    </div>
+
+
+    <div class="footer">
+
+        Your memories. Your time. Your story.
+
+    </div>
+
+
+</div>
+
+
+<script>
+
+    /* =========================
+       URL MESSAGE
+    ========================= */
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+
+    const message =
+        document.getElementById(
+            "message"
+        );
+
+
+    if (
+        params.get("error") ===
+        "failed"
+    ) {
+
+        message.textContent =
+            "This email may already be registered. Please try another email or sign in.";
+
+        message.classList.add(
+            "show"
+        );
+
+    }
+
+
+    /* =========================
+       PASSWORD TOGGLE
+    ========================= */
+
+    document
+        .querySelectorAll(
+            ".toggle-password"
+        )
+        .forEach(
+            function (button) {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        const target =
+                            document.getElementById(
+                                button.dataset.target
+                            );
+
+
+                        if (
+                            target.type ===
+                            "password"
+                        ) {
+
+                            target.type =
+                                "text";
+
+                            button.textContent =
+                                "Hide";
+
+                        } else {
+
+                            target.type =
+                                "password";
+
+                            button.textContent =
+                                "Show";
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+
+    /* =========================
+       PASSWORD STRENGTH
+    ========================= */
+
+    const password =
+        document.getElementById(
+            "password"
+        );
+
+    const strengthBar =
+        document.getElementById(
+            "strengthBar"
+        );
+
+    const strengthText =
+        document.getElementById(
+            "strengthText"
+        );
+
+
+    password.addEventListener(
+        "input",
+        function () {
+
+            const value =
+                password.value;
+
+
+            if (!value) {
+
+                strengthBar.style.width =
+                    "0%";
+
+                strengthText.textContent =
+                    "Enter a password";
+
+                return;
+
+            }
+
+
+            let score = 0;
+
+
+            if (value.length >= 6) {
+                score++;
+            }
+
+            if (value.length >= 10) {
+                score++;
+            }
+
+            if (/[A-Z]/.test(value)) {
+                score++;
+            }
+
+            if (/[0-9]/.test(value)) {
+                score++;
+            }
+
+            if (/[^A-Za-z0-9]/.test(value)) {
+                score++;
+            }
+
+
+            const percentage =
+                score * 20;
+
+
+            strengthBar.style.width =
+                percentage + "%";
+
+
+            if (score <= 1) {
+
+                strengthText.textContent =
+                    "Weak password";
+
+            } else if (score <= 3) {
+
+                strengthText.textContent =
+                    "Moderate password";
+
+            } else {
+
+                strengthText.textContent =
+                    "Strong password";
+
+            }
+
+        }
+    );
+
+
+    /* =========================
+       FORM VALIDATION
+    ========================= */
+
+    const registerForm =
+        document.getElementById(
+            "registerForm"
+        );
+
+    const confirmPassword =
+        document.getElementById(
+            "confirmPassword"
+        );
+
+    const registerButton =
+        document.getElementById(
+            "registerButton"
+        );
+
+
+    registerForm.addEventListener(
+        "submit",
+        function (event) {
+
+            if (
+                password.value !==
+                confirmPassword.value
+            ) {
+
+                event.preventDefault();
+
+                message.textContent =
+                    "Passwords do not match. Please check both fields.";
+
+                message.classList.add(
+                    "show"
+                );
+
+                confirmPassword.focus();
+
+                return;
+
+            }
+
+
+            /*
+             * Submit normally.
+             */
+
+            registerButton.disabled =
+                true;
+
+            registerButton.textContent =
+                "CREATING ACCOUNT...";
+
+        }
+    );
+
+
+    /* =========================
+       RESTORE BUTTON
+       ========================= */
+
+    window.addEventListener(
+        "pageshow",
+        function () {
+
+            registerButton.disabled =
+                false;
+
+            registerButton.textContent =
+                "CREATE ACCOUNT";
+
+        }
+    );
+
+</script>
+
+
+</body>
+
+</html>
