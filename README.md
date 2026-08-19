@@ -889,7 +889,7 @@ The project demonstrates how a user-facing web application can interact with a d
 
 # 👨‍💻 Author
 
-**Vivek**
+**Charan**
 
 Future Capsule was developed as a Java web application project focused on scheduled message delivery and backend automation.
 
