@@ -185,78 +185,38 @@ public class TimeCapsuleDAO {
     // CREATE CAPSULE
     // =========================================================
 
-    public int createCapsule(
-            TimeCapsule capsule) {
+    public int createCapsule(TimeCapsule capsule) {
 
         String sql = """
-                INSERT INTO time_capsules
-                (user_id, title, message, delivery_date, status)
-                VALUES (?, ?, ?, ?, ?)
-                """;
+            INSERT INTO time_capsules
+            (user_id, title, message, delivery_date, status)
+            VALUES (?, ?, ?, ?, ?)
+            """;
 
-        try (Connection connection =
-                     DBConnection.getConnection();
+        try (Connection connection = DBConnection.getConnection();
              PreparedStatement statement =
                      connection.prepareStatement(
                              sql,
                              Statement.RETURN_GENERATED_KEYS
                      )) {
 
-            statement.setInt(
-                    1,
-                    capsule.getUserId()
-            );
+            statement.setInt(1, capsule.getUserId());
 
-            statement.setString(
-                    2,
-                    capsule.getTitle()
-            );
+            statement.setString(2, capsule.getTitle());
 
-            statement.setString(
-                    3,
-                    capsule.getMessage()
-            );
+            statement.setString(3, capsule.getMessage());
 
-            /*
-             * IMPORTANT:
-             *
-             * Do not convert LocalDateTime to UTC manually.
-             *
-             * The application is using Asia/Kolkata as its
-             * configured JDBC timezone.
-             */
-            LocalDateTime deliveryDate =
-                    capsule.getDeliveryDate();
-
-            System.out.println(
-                    "DEBUG deliveryDate LocalDateTime = "
-                            + deliveryDate
-            );
-
-            System.out.println(
-                    "DEBUG Timestamp.valueOf = "
-                            + java.sql.Timestamp.valueOf(
-                            deliveryDate
-                    )
-            );
-
-            System.out.println(
-                    "DEBUG Java default timezone = "
-                            + java.util.TimeZone
-                            .getDefault()
-                            .getID()
-            );
-
-            statement.setTimestamp(
+            // Preserve the user's selected wall-clock time exactly.
+            statement.setObject(
                     4,
-                    java.sql.Timestamp.valueOf(
-                            deliveryDate
-                    )
+                    capsule.getDeliveryDate()
             );
 
-            statement.setString(
-                    5,
-                    capsule.getStatus()
+            statement.setString(5, capsule.getStatus());
+
+            System.out.println(
+                    "CREATE CAPSULE DEBUG: deliveryDate = "
+                            + capsule.getDeliveryDate()
             );
 
             int rowsAffected =
@@ -270,7 +230,6 @@ public class TimeCapsuleDAO {
                          statement.getGeneratedKeys()) {
 
                 if (generatedKeys.next()) {
-
                     return generatedKeys.getInt(1);
                 }
             }
@@ -286,7 +245,6 @@ public class TimeCapsuleDAO {
 
         return -1;
     }
-
 
     // =========================================================
     // FIND CAPSULES BY USER
