@@ -14,24 +14,26 @@ import java.time.LocalDateTime;
 
 public class TimeCapsuleDAO {
 
+    // =========================================================
+    // DELETE CAPSULE
+    // =========================================================
 
     public boolean deleteCapsule(
             int capsuleId,
             int userId) {
 
         String sql = """
-            DELETE FROM time_capsules
-            WHERE id = ?
-              AND user_id = ?
-              AND status = 'PENDING'
-            """;
+                DELETE FROM time_capsules
+                WHERE id = ?
+                  AND user_id = ?
+                  AND status = 'PENDING'
+                """;
 
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement statement =
                      connection.prepareStatement(sql)) {
 
             statement.setInt(1, capsuleId);
-
             statement.setInt(2, userId);
 
             int rowsAffected =
@@ -52,6 +54,10 @@ public class TimeCapsuleDAO {
     }
 
 
+    // =========================================================
+    // UPDATE CAPSULE
+    // =========================================================
+
     public boolean updateCapsule(
             int capsuleId,
             int userId,
@@ -60,14 +66,14 @@ public class TimeCapsuleDAO {
             LocalDateTime deliveryDate) {
 
         String sql = """
-            UPDATE time_capsules
-            SET title = ?,
-                message = ?,
-                delivery_date = ?
-            WHERE id = ?
-              AND user_id = ?
-              AND status = 'PENDING'
-            """;
+                UPDATE time_capsules
+                SET title = ?,
+                    message = ?,
+                    delivery_date = ?
+                WHERE id = ?
+                  AND user_id = ?
+                  AND status = 'PENDING'
+                """;
 
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement statement =
@@ -77,6 +83,11 @@ public class TimeCapsuleDAO {
 
             statement.setString(2, message);
 
+            /*
+             * LocalDateTime represents the user's wall-clock time.
+             * Convert directly to Timestamp without applying another
+             * timezone conversion.
+             */
             statement.setTimestamp(
                     3,
                     java.sql.Timestamp.valueOf(deliveryDate)
@@ -104,16 +115,27 @@ public class TimeCapsuleDAO {
     }
 
 
-    public TimeCapsule findCapsuleById(int capsuleId) {
+    // =========================================================
+    // FIND CAPSULE BY ID
+    // =========================================================
+
+    public TimeCapsule findCapsuleById(
+            int capsuleId) {
 
         String sql = """
-            SELECT id, user_id, title, message,
-                   delivery_date, status, created_at
-            FROM time_capsules
-            WHERE id = ?
-            """;
+                SELECT id,
+                       user_id,
+                       title,
+                       message,
+                       delivery_date,
+                       status,
+                       created_at
+                FROM time_capsules
+                WHERE id = ?
+                """;
 
-        try (Connection connection = DBConnection.getConnection();
+        try (Connection connection =
+                     DBConnection.getConnection();
              PreparedStatement statement =
                      connection.prepareStatement(sql)) {
 
@@ -159,7 +181,12 @@ public class TimeCapsuleDAO {
     }
 
 
-    public int createCapsule(TimeCapsule capsule) {
+    // =========================================================
+    // CREATE CAPSULE
+    // =========================================================
+
+    public int createCapsule(
+            TimeCapsule capsule) {
 
         String sql = """
                 INSERT INTO time_capsules
@@ -167,29 +194,73 @@ public class TimeCapsuleDAO {
                 VALUES (?, ?, ?, ?, ?)
                 """;
 
-        try (Connection connection = DBConnection.getConnection();
+        try (Connection connection =
+                     DBConnection.getConnection();
              PreparedStatement statement =
                      connection.prepareStatement(
                              sql,
                              Statement.RETURN_GENERATED_KEYS
                      )) {
 
-            statement.setInt(1, capsule.getUserId());
+            statement.setInt(
+                    1,
+                    capsule.getUserId()
+            );
 
-            statement.setString(2, capsule.getTitle());
+            statement.setString(
+                    2,
+                    capsule.getTitle()
+            );
 
-            statement.setString(3, capsule.getMessage());
+            statement.setString(
+                    3,
+                    capsule.getMessage()
+            );
+
+            /*
+             * IMPORTANT:
+             *
+             * Do not convert LocalDateTime to UTC manually.
+             *
+             * The application is using Asia/Kolkata as its
+             * configured JDBC timezone.
+             */
+            LocalDateTime deliveryDate =
+                    capsule.getDeliveryDate();
+
+            System.out.println(
+                    "DEBUG deliveryDate LocalDateTime = "
+                            + deliveryDate
+            );
+
+            System.out.println(
+                    "DEBUG Timestamp.valueOf = "
+                            + java.sql.Timestamp.valueOf(
+                            deliveryDate
+                    )
+            );
+
+            System.out.println(
+                    "DEBUG Java default timezone = "
+                            + java.util.TimeZone
+                            .getDefault()
+                            .getID()
+            );
 
             statement.setTimestamp(
                     4,
                     java.sql.Timestamp.valueOf(
-                            capsule.getDeliveryDate()
+                            deliveryDate
                     )
             );
 
-            statement.setString(5, capsule.getStatus());
+            statement.setString(
+                    5,
+                    capsule.getStatus()
+            );
 
-            int rowsAffected = statement.executeUpdate();
+            int rowsAffected =
+                    statement.executeUpdate();
 
             if (rowsAffected == 0) {
                 return -1;
@@ -217,19 +288,31 @@ public class TimeCapsuleDAO {
     }
 
 
-    public List<TimeCapsule> findCapsulesByUser(int userId) {
+    // =========================================================
+    // FIND CAPSULES BY USER
+    // =========================================================
+
+    public List<TimeCapsule> findCapsulesByUser(
+            int userId) {
 
         String sql = """
-            SELECT id, user_id, title, message,
-                   delivery_date, status, created_at
-            FROM time_capsules
-            WHERE user_id = ?
-            ORDER BY delivery_date ASC
-            """;
+                SELECT id,
+                       user_id,
+                       title,
+                       message,
+                       delivery_date,
+                       status,
+                       created_at
+                FROM time_capsules
+                WHERE user_id = ?
+                ORDER BY delivery_date ASC
+                """;
 
-        List<TimeCapsule> capsules = new ArrayList<>();
+        List<TimeCapsule> capsules =
+                new ArrayList<>();
 
-        try (Connection connection = DBConnection.getConnection();
+        try (Connection connection =
+                     DBConnection.getConnection();
              PreparedStatement statement =
                      connection.prepareStatement(sql)) {
 
@@ -242,19 +325,30 @@ public class TimeCapsuleDAO {
 
                     TimeCapsule capsule =
                             new TimeCapsule(
-                                    resultSet.getInt("id"),
 
-                                    resultSet.getInt("user_id"),
+                                    resultSet.getInt(
+                                            "id"
+                                    ),
 
-                                    resultSet.getString("title"),
+                                    resultSet.getInt(
+                                            "user_id"
+                                    ),
 
-                                    resultSet.getString("message"),
+                                    resultSet.getString(
+                                            "title"
+                                    ),
+
+                                    resultSet.getString(
+                                            "message"
+                                    ),
 
                                     resultSet.getTimestamp(
                                             "delivery_date"
                                     ).toLocalDateTime(),
 
-                                    resultSet.getString("status"),
+                                    resultSet.getString(
+                                            "status"
+                                    ),
 
                                     resultSet.getTimestamp(
                                             "created_at"
@@ -278,17 +372,25 @@ public class TimeCapsuleDAO {
     }
 
 
+    // =========================================================
+    // FIND DUE CAPSULES
+    // =========================================================
 
     public List<TimeCapsule> findDueCapsules() {
 
         String sql = """
-        SELECT id, user_id, title, message,
-               delivery_date, status, created_at
-        FROM time_capsules
-        WHERE status = 'PENDING'
-          AND delivery_date <= NOW()
-        ORDER BY delivery_date ASC
-        """;
+                SELECT id,
+                       user_id,
+                       title,
+                       message,
+                       delivery_date,
+                       status,
+                       created_at
+                FROM time_capsules
+                WHERE status = 'PENDING'
+                  AND delivery_date <= NOW()
+                ORDER BY delivery_date ASC
+                """;
 
         List<TimeCapsule> capsules =
                 new ArrayList<>();
@@ -305,19 +407,29 @@ public class TimeCapsuleDAO {
                 TimeCapsule capsule =
                         new TimeCapsule(
 
-                                resultSet.getInt("id"),
+                                resultSet.getInt(
+                                        "id"
+                                ),
 
-                                resultSet.getInt("user_id"),
+                                resultSet.getInt(
+                                        "user_id"
+                                ),
 
-                                resultSet.getString("title"),
+                                resultSet.getString(
+                                        "title"
+                                ),
 
-                                resultSet.getString("message"),
+                                resultSet.getString(
+                                        "message"
+                                ),
 
                                 resultSet.getTimestamp(
                                         "delivery_date"
                                 ).toLocalDateTime(),
 
-                                resultSet.getString("status"),
+                                resultSet.getString(
+                                        "status"
+                                ),
 
                                 resultSet.getTimestamp(
                                         "created_at"
@@ -339,21 +451,30 @@ public class TimeCapsuleDAO {
         return capsules;
     }
 
-    public boolean markAsDelivered(int capsuleId) {
+
+    // =========================================================
+    // MARK CAPSULE AS DELIVERED
+    // =========================================================
+
+    public boolean markAsDelivered(
+            int capsuleId) {
 
         String sql = """
-        UPDATE time_capsules
-        SET status = 'DELIVERED'
-        WHERE id = ?
-          AND status = 'PENDING'
-        """;
+                UPDATE time_capsules
+                SET status = 'DELIVERED'
+                WHERE id = ?
+                  AND status = 'PENDING'
+                """;
 
         try (Connection connection =
                      DBConnection.getConnection();
              PreparedStatement statement =
                      connection.prepareStatement(sql)) {
 
-            statement.setInt(1, capsuleId);
+            statement.setInt(
+                    1,
+                    capsuleId
+            );
 
             int rowsAffected =
                     statement.executeUpdate();
