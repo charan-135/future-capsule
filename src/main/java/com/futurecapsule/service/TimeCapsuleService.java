@@ -2,6 +2,7 @@ package com.futurecapsule.service;
 import java.util.List;
 import com.futurecapsule.dao.TimeCapsuleDAO;
 import com.futurecapsule.model.TimeCapsule;
+import java.time.ZoneOffset;
 
 import java.time.LocalDateTime;
 
@@ -42,7 +43,7 @@ public class TimeCapsuleService {
             );
         }
 
-        if (!deliveryDate.isAfter(LocalDateTime.now())) {
+        if (!deliveryDate.isAfter(LocalDateTime.now(ZoneOffset.UTC))) {
 
             throw new IllegalArgumentException(
                     "Delivery date must be in the future."
@@ -120,7 +121,7 @@ public class TimeCapsuleService {
             );
         }
 
-        if (!deliveryDate.isAfter(LocalDateTime.now())) {
+        if (!deliveryDate.isAfter(LocalDateTime.now(ZoneOffset.UTC))) {
             throw new IllegalArgumentException(
                     "Delivery date must be in the future."
             );

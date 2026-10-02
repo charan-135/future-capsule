@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.time.ZoneId;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -244,9 +245,11 @@ public class EditCapsuleServlet extends HttpServlet {
             int capsuleId =
                     Integer.parseInt(idParameter);
 
-
             LocalDateTime dateTime =
-                    LocalDateTime.parse(deliveryDate);
+                    LocalDateTime.parse(deliveryDate)
+                            .atZone(ZoneId.of("Asia/Kolkata"))
+                            .withZoneSameInstant(ZoneId.of("UTC"))
+                            .toLocalDateTime();
 
 
             // -----------------------------

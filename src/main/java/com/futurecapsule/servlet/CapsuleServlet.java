@@ -8,6 +8,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.time.ZoneId;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -98,9 +99,10 @@ public class CapsuleServlet extends HttpServlet {
             // -----------------------------
 
             LocalDateTime dateTime =
-                    LocalDateTime.parse(
-                            deliveryDate
-                    );
+                    LocalDateTime.parse(deliveryDate)
+                            .atZone(ZoneId.of("Asia/Kolkata"))
+                            .withZoneSameInstant(ZoneId.of("UTC"))
+                            .toLocalDateTime();
 
 
             // -----------------------------
