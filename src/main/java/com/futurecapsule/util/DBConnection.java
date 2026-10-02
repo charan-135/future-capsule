@@ -6,15 +6,6 @@ import java.sql.SQLException;
 
 public class DBConnection {
 
-    private static final String URL =
-            "jdbc:mysql://localhost:3307/future_capsule";
-
-    private static final String USER =
-            "root";
-
-    private static final String PASSWORD =
-            "root";
-
     public static Connection getConnection() throws SQLException {
 
         try {
@@ -23,10 +14,19 @@ public class DBConnection {
             throw new SQLException("MySQL JDBC Driver not found.", e);
         }
 
+        String host = System.getenv("MYSQLHOST");
+        String port = System.getenv("MYSQLPORT");
+        String database = System.getenv("MYSQLDATABASE");
+        String user = System.getenv("MYSQLUSER");
+        String password = System.getenv("MYSQLPASSWORD");
+
+        String url = "jdbc:mysql://" + host + ":" + port + "/" + database
+                + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+
         return DriverManager.getConnection(
-                URL,
-                USER,
-                PASSWORD
+                url,
+                user,
+                password
         );
     }
 }
