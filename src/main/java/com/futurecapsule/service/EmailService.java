@@ -1,102 +1,49 @@
 package com.futurecapsule.service;
 
-import jakarta.mail.Authenticator;
-import jakarta.mail.Message;
-import jakarta.mail.MessagingException;
-import jakarta.mail.PasswordAuthentication;
-import jakarta.mail.Session;
-import jakarta.mail.Transport;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeMessage;
-
 import com.futurecapsule.model.TimeCapsule;
+import com.resend.Resend;
+import com.resend.core.exception.ResendException;
+import com.resend.services.emails.model.CreateEmailOptions;
+import com.resend.services.emails.model.CreateEmailResponse;
 
 import java.time.format.DateTimeFormatter;
-import java.util.Properties;
 
 public class EmailService {
 
-    private final String username;
-    private final String password;
+    private final Resend resend;
+    private final String senderEmail;
 
     public EmailService() {
 
-        username = System.getenv("FUTURE_CAPSULE_EMAIL");
-        password = System.getenv("FUTURE_CAPSULE_EMAIL_PASSWORD");
+        String apiKey =
+                System.getenv("RESEND_API_KEY");
 
-        if (username == null || username.isBlank()) {
+        if (apiKey == null || apiKey.isBlank()) {
+
             throw new IllegalStateException(
-                    "FUTURE_CAPSULE_EMAIL environment variable is not set."
+                    "RESEND_API_KEY environment variable is not set."
             );
         }
 
-        if (password == null || password.isBlank()) {
-            throw new IllegalStateException(
-                    "FUTURE_CAPSULE_EMAIL_PASSWORD environment variable is not set."
-            );
-        }
+        /*
+         * Resend's onboarding sender can be used
+         * for initial testing.
+         *
+         * Later, after verifying your own domain,
+         * change this to your verified sender address.
+         */
+        senderEmail =
+                "onboarding@resend.dev";
+
+        resend =
+                new Resend(apiKey);
     }
 
     public void sendCapsuleEmail(
             String recipientEmail,
             TimeCapsule capsule,
             String recipientName)
-            throws MessagingException {
-
-        Properties properties = new Properties();
-
-        properties.put(
-                "mail.smtp.host",
-                "smtp.gmail.com"
-        );
-
-        properties.put(
-                "mail.smtp.port",
-                "587"
-        );
-
-        properties.put(
-                "mail.smtp.auth",
-                "true"
-        );
-
-        properties.put(
-                "mail.smtp.starttls.enable",
-                "true"
-        );
-
-        Session session =
-                Session.getInstance(
-                        properties,
-                        new Authenticator() {
-
-                            @Override
-                            protected PasswordAuthentication
-                            getPasswordAuthentication() {
-
-                                return new PasswordAuthentication(
-                                        username,
-                                        password
-                                );
-                            }
-                        }
-                );
-
-        Message email =
-                new MimeMessage(session);
-
-        email.setFrom(
-                new InternetAddress(username)
-        );
-
-        email.setRecipients(
-                Message.RecipientType.TO,
-                InternetAddress.parse(recipientEmail)
-        );
-
-        email.setSubject(
-                "Your Future Capsule Has Arrived"
-        );
+            throws Exception {
 
         DateTimeFormatter formatter =
                 DateTimeFormatter.ofPattern(
@@ -145,13 +92,43 @@ public class EmailService {
                 deliveryDate
         );
 
-        email.setText(emailBody);
+        CreateEmailOptions params =
+                CreateEmailOptions.builder()
+                        .from(
+                                "Future Capsule <"
+                                        + senderEmail
+                                        + ">"
+                        )
+                        .to(recipientEmail)
+                        .subject(
+                                "Your Future Capsule Has Arrived"
+                        )
+                        .text(emailBody)
+                        .build();
 
-        Transport.send(email);
+        try {
 
-        System.out.println(
-                "Capsule email sent successfully to: "
-                        + recipientEmail
-        );
+            CreateEmailResponse response =
+                    resend.emails().send(params);
+
+            System.out.println(
+                    "Capsule email sent successfully."
+            );
+
+            System.out.println(
+                    "Resend Email ID: "
+                            + response.getId()
+            );
+
+        } catch (ResendException e) {
+
+            System.out.println(
+                    "Resend failed to send capsule email."
+            );
+
+            e.printStackTrace();
+
+            throw e;
+        }
     }
 }
