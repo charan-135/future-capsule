@@ -8,9 +8,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.time.LocalDateTime;
 
 public class TimeCapsuleDAO {
 
@@ -84,15 +84,15 @@ public class TimeCapsuleDAO {
             statement.setString(2, message);
 
             /*
-             * IMPORTANT:
+             * delivery_date is MySQL DATETIME.
              *
-             * delivery_date is a MySQL DATETIME.
+             * The value selected by the user is an IST
+             * wall-clock LocalDateTime.
              *
-             * LocalDateTime represents the exact wall-clock
-             * time selected by the user.
+             * Write it directly.
              *
-             * Use setObject(LocalDateTime) directly.
-             * Do NOT convert through java.sql.Timestamp.
+             * DO NOT use Timestamp.valueOf().
+             * DO NOT convert to UTC.
              */
             statement.setObject(
                     3,
@@ -234,23 +234,24 @@ public class TimeCapsuleDAO {
             );
 
             /*
-             * IMPORTANT:
+             * IMPORTANT
              *
-             * MySQL column:
+             * MySQL:
              *
              *     delivery_date DATETIME
              *
-             * LocalDateTime is intentionally written directly.
+             * The selected delivery time is an IST
+             * wall-clock time.
              *
              * Example:
              *
              *     2026-10-04T15:41
              *
-             * becomes:
+             * is stored as:
              *
              *     2026-10-04 15:41:00
              *
-             * No timezone conversion is performed.
+             * No timezone conversion.
              */
             LocalDateTime deliveryDate =
                     capsule.getDeliveryDate();
@@ -281,6 +282,7 @@ public class TimeCapsuleDAO {
                          statement.getGeneratedKeys()) {
 
                 if (generatedKeys.next()) {
+
                     return generatedKeys.getInt(1);
                 }
             }
@@ -335,6 +337,7 @@ public class TimeCapsuleDAO {
 
                     /*
                      * Read DATETIME directly as LocalDateTime.
+                     *
                      * No timezone conversion.
                      */
                     LocalDateTime deliveryDate =
@@ -399,13 +402,12 @@ public class TimeCapsuleDAO {
         /*
          * delivery_date is stored as IST wall-clock time.
          *
-         * Railway/MySQL may use UTC as its system timezone.
+         * MySQL/Railway may use UTC for NOW().
          *
-         * Therefore do NOT compare directly with NOW().
+         * Therefore convert the current UTC time to IST
+         * before comparing with delivery_date.
          *
-         * Convert the current UTC time to IST explicitly:
-         *
-         * UTC + 05:30
+         * IST = UTC + 05:30
          */
         String sql = """
                 SELECT id,
@@ -418,7 +420,9 @@ public class TimeCapsuleDAO {
                 FROM time_capsules
                 WHERE status = 'PENDING'
                   AND delivery_date <=
-                      (UTC_TIMESTAMP() + INTERVAL 5 HOUR + INTERVAL 30 MINUTE)
+                      (UTC_TIMESTAMP()
+                       + INTERVAL 5 HOUR
+                       + INTERVAL 30 MINUTE)
                 ORDER BY delivery_date ASC
                 """;
 
