@@ -8,9 +8,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.LocalDateTime;
 
 public class TimeCapsuleDAO {
 
@@ -84,19 +84,13 @@ public class TimeCapsuleDAO {
             statement.setString(2, message);
 
             /*
-             * delivery_date is MySQL DATETIME.
-             *
-             * The value selected by the user is an IST
-             * wall-clock LocalDateTime.
-             *
-             * Write it directly.
-             *
-             * DO NOT use Timestamp.valueOf().
-             * DO NOT convert to UTC.
+             * LocalDateTime represents the user's wall-clock time.
+             * Convert directly to Timestamp without applying another
+             * timezone conversion.
              */
-            statement.setObject(
+            statement.setTimestamp(
                     3,
-                    deliveryDate
+                    java.sql.Timestamp.valueOf(deliveryDate)
             );
 
             statement.setInt(4, capsuleId);
@@ -152,18 +146,6 @@ public class TimeCapsuleDAO {
 
                 if (resultSet.next()) {
 
-                    /*
-                     * Read MySQL DATETIME directly as
-                     * LocalDateTime.
-                     *
-                     * This prevents JDBC timezone conversion.
-                     */
-                    LocalDateTime deliveryDate =
-                            resultSet.getObject(
-                                    "delivery_date",
-                                    LocalDateTime.class
-                            );
-
                     return new TimeCapsule(
                             resultSet.getInt("id"),
 
@@ -173,7 +155,9 @@ public class TimeCapsuleDAO {
 
                             resultSet.getString("message"),
 
-                            deliveryDate,
+                            resultSet.getTimestamp(
+                                    "delivery_date"
+                            ).toLocalDateTime(),
 
                             resultSet.getString("status"),
 
@@ -201,74 +185,38 @@ public class TimeCapsuleDAO {
     // CREATE CAPSULE
     // =========================================================
 
-    public int createCapsule(
-            TimeCapsule capsule) {
+    public int createCapsule(TimeCapsule capsule) {
 
         String sql = """
-                INSERT INTO time_capsules
-                (user_id, title, message, delivery_date, status)
-                VALUES (?, ?, ?, ?, ?)
-                """;
+            INSERT INTO time_capsules
+            (user_id, title, message, delivery_date, status)
+            VALUES (?, ?, ?, ?, ?)
+            """;
 
-        try (Connection connection =
-                     DBConnection.getConnection();
+        try (Connection connection = DBConnection.getConnection();
              PreparedStatement statement =
                      connection.prepareStatement(
                              sql,
                              Statement.RETURN_GENERATED_KEYS
                      )) {
 
-            statement.setInt(
-                    1,
-                    capsule.getUserId()
+            statement.setInt(1, capsule.getUserId());
+
+            statement.setString(2, capsule.getTitle());
+
+            statement.setString(3, capsule.getMessage());
+
+            // Preserve the user's selected wall-clock time exactly.
+            statement.setObject(
+                    4,
+                    capsule.getDeliveryDate()
             );
 
-            statement.setString(
-                    2,
-                    capsule.getTitle()
-            );
-
-            statement.setString(
-                    3,
-                    capsule.getMessage()
-            );
-
-            /*
-             * IMPORTANT
-             *
-             * MySQL:
-             *
-             *     delivery_date DATETIME
-             *
-             * The selected delivery time is an IST
-             * wall-clock time.
-             *
-             * Example:
-             *
-             *     2026-10-04T15:41
-             *
-             * is stored as:
-             *
-             *     2026-10-04 15:41:00
-             *
-             * No timezone conversion.
-             */
-            LocalDateTime deliveryDate =
-                    capsule.getDeliveryDate();
+            statement.setString(5, capsule.getStatus());
 
             System.out.println(
                     "CREATE CAPSULE DEBUG: deliveryDate = "
-                            + deliveryDate
-            );
-
-            statement.setObject(
-                    4,
-                    deliveryDate
-            );
-
-            statement.setString(
-                    5,
-                    capsule.getStatus()
+                            + capsule.getDeliveryDate()
             );
 
             int rowsAffected =
@@ -282,7 +230,6 @@ public class TimeCapsuleDAO {
                          statement.getGeneratedKeys()) {
 
                 if (generatedKeys.next()) {
-
                     return generatedKeys.getInt(1);
                 }
             }
@@ -298,7 +245,6 @@ public class TimeCapsuleDAO {
 
         return -1;
     }
-
 
     // =========================================================
     // FIND CAPSULES BY USER
@@ -335,17 +281,6 @@ public class TimeCapsuleDAO {
 
                 while (resultSet.next()) {
 
-                    /*
-                     * Read DATETIME directly as LocalDateTime.
-                     *
-                     * No timezone conversion.
-                     */
-                    LocalDateTime deliveryDate =
-                            resultSet.getObject(
-                                    "delivery_date",
-                                    LocalDateTime.class
-                            );
-
                     TimeCapsule capsule =
                             new TimeCapsule(
 
@@ -365,7 +300,9 @@ public class TimeCapsuleDAO {
                                             "message"
                                     ),
 
-                                    deliveryDate,
+                                    resultSet.getTimestamp(
+                                            "delivery_date"
+                                    ).toLocalDateTime(),
 
                                     resultSet.getString(
                                             "status"
@@ -399,16 +336,6 @@ public class TimeCapsuleDAO {
 
     public List<TimeCapsule> findDueCapsules() {
 
-        /*
-         * delivery_date is stored as IST wall-clock time.
-         *
-         * MySQL/Railway may use UTC for NOW().
-         *
-         * Therefore convert the current UTC time to IST
-         * before comparing with delivery_date.
-         *
-         * IST = UTC + 05:30
-         */
         String sql = """
                 SELECT id,
                        user_id,
@@ -419,10 +346,7 @@ public class TimeCapsuleDAO {
                        created_at
                 FROM time_capsules
                 WHERE status = 'PENDING'
-                  AND delivery_date <=
-                      (UTC_TIMESTAMP()
-                       + INTERVAL 5 HOUR
-                       + INTERVAL 30 MINUTE)
+                  AND delivery_date <= NOW()
                 ORDER BY delivery_date ASC
                 """;
 
@@ -437,15 +361,6 @@ public class TimeCapsuleDAO {
                      statement.executeQuery()) {
 
             while (resultSet.next()) {
-
-                /*
-                 * Read DATETIME directly as LocalDateTime.
-                 */
-                LocalDateTime deliveryDate =
-                        resultSet.getObject(
-                                "delivery_date",
-                                LocalDateTime.class
-                        );
 
                 TimeCapsule capsule =
                         new TimeCapsule(
@@ -466,7 +381,9 @@ public class TimeCapsuleDAO {
                                         "message"
                                 ),
 
-                                deliveryDate,
+                                resultSet.getTimestamp(
+                                        "delivery_date"
+                                ).toLocalDateTime(),
 
                                 resultSet.getString(
                                         "status"
@@ -534,3 +451,4 @@ public class TimeCapsuleDAO {
         }
     }
 }
+
