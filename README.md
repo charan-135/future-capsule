@@ -1,17 +1,8 @@
-
-
-````markdown
-
-
 # ⏳ Future Capsule
 
 > **Messages beyond time.**
 
-🌐 **[Live Demo](https://future-capsule-production.up.railway.app/login.html)**
-
-
-
-> **Messages beyond time.**
+🌐 [**Live Demo**](https://future-capsule-production.up.railway.app/login.html)
 
 Future Capsule is a Java-based web application that allows users to write messages to their future selves and schedule them for delivery at a specific date and time.
 
@@ -162,7 +153,7 @@ Future Capsule follows a layered Java web application architecture.
                        │
                        ▼
                     📧 Email
-````
+```
 
 ---
 
@@ -816,6 +807,8 @@ This prevents the scheduler from continuing to run after the web application has
 
 The application is designed to run as a Java web application using Apache Tomcat.
 
+A live deployment is hosted on Railway: [future-capsule-production.up.railway.app](https://future-capsule-production.up.railway.app/login.html)
+
 For production deployment, the following services are required:
 
 ```text
@@ -906,26 +899,3 @@ Future Capsule was developed as a Java web application project focused on schedu
 # 📜 License
 
 This project is intended for educational and portfolio purposes.
-
-````
-
-### One small thing, bro
-
-Before you commit this README, **replace**:
-
-```text
-YOUR_USERNAME
-````
-
-with your actual GitHub username in the clone URL.
-
-And don't put your Gmail address or App Password anywhere in the README.
-
-After you save `README.md`, run:
-
-```bat
-git add README.md
-git commit -m "Add project documentation"
-git push
-```
-
