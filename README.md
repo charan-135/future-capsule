@@ -3,7 +3,11 @@
 ````markdown
 # ⏳ Future Capsule
 
-🔗 **Live Demo:** [https://your-railway-url.up.railway.app](https://future-capsule-production.up.railway.app/my-capsules)
+> **Messages beyond time.**
+
+🌐 **Live Demo:** [https://future-capsule-production.up.railway.app/login.html](https://future-capsule-production.up.railway.app/login.html)
+
+Future Capsule is a Java-based web application that allows users to write messages to their future selves and schedule them for delivery at a specific date and time.
 
 
 
