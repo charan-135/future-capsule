@@ -1,19 +1,21 @@
 package com.futurecapsule.service;
-import java.util.List;
+
 import com.futurecapsule.dao.TimeCapsuleDAO;
 import com.futurecapsule.model.TimeCapsule;
-import java.time.ZoneOffset;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.List;
 
 public class TimeCapsuleService {
+
+    private static final ZoneId IST =
+            ZoneId.of("Asia/Kolkata");
 
     private final TimeCapsuleDAO capsuleDAO;
 
     public TimeCapsuleService() {
-
-        this.capsuleDAO =
-                new TimeCapsuleDAO();
+        this.capsuleDAO = new TimeCapsuleDAO();
     }
 
     public int createCapsule(
@@ -22,29 +24,39 @@ public class TimeCapsuleService {
             String message,
             LocalDateTime deliveryDate) {
 
-        if (title == null || title.isBlank()) {
+        if (userId <= 0) {
+            throw new IllegalArgumentException(
+                    "Invalid user ID."
+            );
+        }
 
+        if (title == null || title.isBlank()) {
             throw new IllegalArgumentException(
                     "Title cannot be empty."
             );
         }
 
         if (message == null || message.isBlank()) {
-
             throw new IllegalArgumentException(
                     "Message cannot be empty."
             );
         }
 
         if (deliveryDate == null) {
-
             throw new IllegalArgumentException(
                     "Delivery date is required."
             );
         }
 
-        if (!deliveryDate.isAfter(LocalDateTime.now(ZoneOffset.UTC))) {
+        /*
+         * deliveryDate comes from the browser as IST.
+         *
+         * Therefore compare it with the current IST time.
+         */
+        LocalDateTime nowIST =
+                LocalDateTime.now(IST);
 
+        if (!deliveryDate.isAfter(nowIST)) {
             throw new IllegalArgumentException(
                     "Delivery date must be in the future."
             );
@@ -61,7 +73,9 @@ public class TimeCapsuleService {
         return capsuleDAO.createCapsule(capsule);
     }
 
-    public List<TimeCapsule> getCapsulesByUser(int userId) {
+
+    public List<TimeCapsule> getCapsulesByUser(
+            int userId) {
 
         if (userId <= 0) {
             throw new IllegalArgumentException(
@@ -72,7 +86,9 @@ public class TimeCapsuleService {
         return capsuleDAO.findCapsulesByUser(userId);
     }
 
-    public TimeCapsule getCapsule(int capsuleId) {
+
+    public TimeCapsule getCapsule(
+            int capsuleId) {
 
         if (capsuleId <= 0) {
             throw new IllegalArgumentException(
@@ -80,7 +96,9 @@ public class TimeCapsuleService {
             );
         }
 
-        return capsuleDAO.findCapsuleById(capsuleId);
+        return capsuleDAO.findCapsuleById(
+                capsuleId
+        );
     }
 
 
@@ -121,7 +139,13 @@ public class TimeCapsuleService {
             );
         }
 
-        if (!deliveryDate.isAfter(LocalDateTime.now(ZoneOffset.UTC))) {
+        /*
+         * Incoming deliveryDate is IST.
+         */
+        LocalDateTime nowIST =
+                LocalDateTime.now(IST);
+
+        if (!deliveryDate.isAfter(nowIST)) {
             throw new IllegalArgumentException(
                     "Delivery date must be in the future."
             );
@@ -135,6 +159,7 @@ public class TimeCapsuleService {
                 deliveryDate
         );
     }
+
 
     public boolean deleteCapsule(
             int capsuleId,

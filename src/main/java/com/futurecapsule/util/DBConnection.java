@@ -11,7 +11,10 @@ public class DBConnection {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
-            throw new SQLException("MySQL JDBC Driver not found.", e);
+            throw new SQLException(
+                    "MySQL JDBC Driver not found.",
+                    e
+            );
         }
 
         String host = System.getenv("MYSQLHOST");
@@ -20,8 +23,11 @@ public class DBConnection {
         String user = System.getenv("MYSQLUSER");
         String password = System.getenv("MYSQLPASSWORD");
 
-        String url = "jdbc:mysql://" + host + ":" + port + "/" + database
-                + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Kolkata";
+        String url =
+                "jdbc:mysql://" + host + ":" + port + "/" + database
+                        + "?useSSL=false"
+                        + "&allowPublicKeyRetrieval=true"
+                        + "&serverTimezone=UTC";
 
         return DriverManager.getConnection(
                 url,

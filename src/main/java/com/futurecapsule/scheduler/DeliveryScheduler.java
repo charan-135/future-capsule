@@ -57,7 +57,6 @@ public class DeliveryScheduler {
             return;
         }
 
-
         for (TimeCapsule capsule : capsules) {
 
             boolean delivered =
