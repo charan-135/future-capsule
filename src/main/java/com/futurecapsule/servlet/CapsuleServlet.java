@@ -8,8 +8,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.time.ZoneId;
-
 import java.io.IOException;
 import java.time.LocalDateTime;
 
@@ -98,11 +96,10 @@ public class CapsuleServlet extends HttpServlet {
             // Convert date
             // -----------------------------
 
+            // The browser sends the selected date/time as an IST wall-clock value.
+            // Keep it as LocalDateTime. Do not convert it to UTC here.
             LocalDateTime dateTime =
-                    LocalDateTime.parse(deliveryDate)
-                            .atZone(ZoneId.of("Asia/Kolkata"))
-                            .withZoneSameInstant(ZoneId.of("UTC"))
-                            .toLocalDateTime();
+                    LocalDateTime.parse(deliveryDate);
 
 
             // -----------------------------

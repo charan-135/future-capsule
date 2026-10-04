@@ -3,6 +3,7 @@ package com.futurecapsule.util;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class DBConnection {
 
@@ -27,12 +28,23 @@ public class DBConnection {
                 "jdbc:mysql://" + host + ":" + port + "/" + database
                         + "?useSSL=false"
                         + "&allowPublicKeyRetrieval=true"
-                        + "&serverTimezone=UTC";
+                        + "&serverTimezone=Asia/Kolkata";
 
-        return DriverManager.getConnection(
-                url,
-                user,
-                password
-        );
+        Connection connection =
+                DriverManager.getConnection(
+                        url,
+                        user,
+                        password
+                );
+
+        // Make MySQL's session clock explicitly IST. This keeps
+        // TIMESTAMP/CURRENT_TIMESTAMP values consistent with the
+        // application's Asia/Kolkata wall-clock time.
+        try (Statement statement =
+                     connection.createStatement()) {
+            statement.execute("SET time_zone = '+05:30'");
+        }
+
+        return connection;
     }
 }

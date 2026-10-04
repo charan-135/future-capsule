@@ -8,11 +8,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -95,19 +92,11 @@ public class TimeCapsuleDAO {
             statement.setString(1, title);
             statement.setString(2, message);
 
-            /*
-             * deliveryDate is IST.
-             *
-             * Convert IST -> Instant -> UTC timestamp.
-             */
-            Instant instant =
-                    deliveryDate
-                            .atZone(IST)
-                            .toInstant();
-
-            statement.setTimestamp(
+            // delivery_date is a wall-clock value in Asia/Kolkata.
+            // Keep it as LocalDateTime; do not convert it to an Instant/UTC.
+            statement.setObject(
                     3,
-                    Timestamp.from(instant)
+                    deliveryDate
             );
 
             statement.setInt(4, capsuleId);
@@ -226,25 +215,12 @@ public class TimeCapsuleDAO {
                     capsule.getMessage()
             );
 
-            /*
-             * Browser value:
-             *
-             * 2026-10-04 11:32 IST
-             *
-             * Convert to an absolute instant.
-             *
-             * Database stores:
-             *
-             * 2026-10-04 06:02 UTC
-             */
-            Instant instant =
-                    capsule.getDeliveryDate()
-                            .atZone(IST)
-                            .toInstant();
-
-            statement.setTimestamp(
+            // Store the exact date/time selected by the user.
+            // The application uses Asia/Kolkata consistently, so no UTC
+            // conversion is performed here.
+            statement.setObject(
                     4,
-                    Timestamp.from(instant)
+                    capsule.getDeliveryDate()
             );
 
             statement.setString(
@@ -262,8 +238,8 @@ public class TimeCapsuleDAO {
             );
 
             System.out.println(
-                    "Stored UTC = "
-                            + instant
+                    "Stored IST = "
+                            + capsule.getDeliveryDate()
             );
 
             int rowsAffected =
@@ -361,20 +337,9 @@ public class TimeCapsuleDAO {
 
     public List<TimeCapsule> findDueCapsules() {
 
-        /*
-         * IMPORTANT:
-         *
-         * delivery_date is stored as UTC.
-         *
-         * Railway/MySQL NOW() is UTC.
-         *
-         * Therefore compare directly:
-         *
-         * delivery_date <= UTC_TIMESTAMP()
-         *
-         * DO NOT add 5 hours 30 minutes here.
-         */
-
+        // Compare the stored IST wall-clock value with the current IST
+        // wall-clock value supplied by Java. This avoids any dependency on
+        // the Railway/MySQL server timezone.
         String sql = """
                 SELECT id,
                        user_id,
@@ -385,7 +350,7 @@ public class TimeCapsuleDAO {
                        created_at
                 FROM time_capsules
                 WHERE status = 'PENDING'
-                  AND delivery_date <= UTC_TIMESTAMP()
+                  AND delivery_date <= ?
                 ORDER BY delivery_date ASC
                 """;
 
@@ -397,17 +362,26 @@ public class TimeCapsuleDAO {
                         DBConnection.getConnection();
 
                 PreparedStatement statement =
-                        connection.prepareStatement(sql);
-
-                ResultSet resultSet =
-                        statement.executeQuery()
+                        connection.prepareStatement(sql)
         ) {
 
-            while (resultSet.next()) {
+            statement.setObject(
+                    1,
+                    LocalDateTime.now(IST)
+            );
 
-                capsules.add(
-                        mapCapsule(resultSet)
-                );
+            try (
+                    ResultSet resultSet =
+                            statement.executeQuery()
+            ) {
+
+                while (resultSet.next()) {
+
+                    capsules.add(
+                            mapCapsule(resultSet)
+                    );
+                }
+
             }
 
         } catch (SQLException e) {
@@ -474,32 +448,21 @@ public class TimeCapsuleDAO {
             throws SQLException {
 
         /*
-         * Database timestamp is UTC.
-         */
-        Timestamp deliveryTimestamp =
-                resultSet.getTimestamp(
-                        "delivery_date"
-                );
-
-        /*
-         * Convert UTC instant -> IST.
+         * Both date/time fields are read as LocalDateTime so the exact
+         * database wall-clock value is preserved. No UTC/IST conversion
+         * is performed here.
          */
         LocalDateTime deliveryDate =
-                deliveryTimestamp
-                        .toInstant()
-                        .atZone(IST)
-                        .toLocalDateTime();
-
-        Timestamp createdTimestamp =
-                resultSet.getTimestamp(
-                        "created_at"
+                resultSet.getObject(
+                        "delivery_date",
+                        LocalDateTime.class
                 );
 
         LocalDateTime createdAt =
-                createdTimestamp
-                        .toInstant()
-                        .atZone(IST)
-                        .toLocalDateTime();
+                resultSet.getObject(
+                        "created_at",
+                        LocalDateTime.class
+                );
 
         return new TimeCapsule(
                 resultSet.getInt("id"),
